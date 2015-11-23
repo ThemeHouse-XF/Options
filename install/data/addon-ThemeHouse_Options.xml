@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon addon_id="ThemeHouse_Options" title="[⌂] Options" version_string="1.0.0" version_id="1447261019" url="http://xf.themehouse.io/" install_callback_class="ThemeHouse_Install" install_callback_method="install" uninstall_callback_class="ThemeHouse_Install" uninstall_callback_method="uninstall">
+  <admin_navigation/>
+  <admin_permissions/>
+  <admin_style_properties/>
+  <admin_templates>
+    <template title="th_top_choosers_options"><![CDATA[<div class="topChoosers">
+	<div class="Popup">
+		<span class="muted">{xen:phrase add_on}:</span> <a rel="Menu">{xen:if $addOnSelected, {$addOns.{$addOnSelected}.title}, '({xen:phrase unspecified})'}</a>
+		<div class="Menu">
+			<div class="primaryContent menuHeader"><h3>{xen:phrase add_on}</h3></div>
+			<ul class="secondaryContent blockLinksList">
+				<li><a href="{xen:adminlink 'add-ons/{$prefix}'}">({xen:phrase unspecified})</a></li>
+				<xen:foreach loop="$addOns" value="$addOn">
+					<li><a href="{xen:adminlink 'add-ons/{$prefix}', $addOn}">{$addOn.title}</a></li>
+				</xen:foreach>
+			</ul>
+		</div>
+	</div>
+</div>]]></template>
+  </admin_templates>
+  <admin_template_modifications>
+    <modification template="addon_list" modification_key="th_addonList_options" description="Adds options to add-on list controls." execution_order="10" enabled="1" action="preg_replace">
+      <find><![CDATA[#(<xen:popup title="{xen:phrase controls}" ctrlclass="toolsCtrl">.*)(</xen:popup>)#Us]]></find>
+      <replace><![CDATA[${1}
+<xen:link href="{xen:adminlink 'add-ons/options', $addOn}">{xen:phrase options}</xen:link>
+${2}]]></replace>
+    </modification>
+    <modification template="option_edit" modification_key="th_optionEdit_options" description="Allow new option ID to be set by controller." execution_order="10" enabled="1" action="preg_replace">
+      <find><![CDATA[#(</xen:title>)(.*<xen:textboxunit label="{xen:phrase option_id}:" name="option_id" value=")([^"]*)(")#Us]]></find>
+      <replace><![CDATA[${1}
+<xen:if is="{$group}">
+	<xen:navigation>
+		<xen:breadcrumb href="{xen:adminlink 'options/list', $group}">{$group.title}</xen:breadcrumb>
+	</xen:navigation>
+</xen:if>
+${2}{xen:if {$option.new_option_id}, {$option.new_option_id}, ${3}}${4}]]></replace>
+    </modification>
+    <modification template="option_group_edit" modification_key="th_optionGroupEdit_options" description="Allow new group ID to be set by controller." execution_order="10" enabled="1" action="preg_replace">
+      <find><![CDATA[#(<xen:textboxunit label="{xen:phrase group_id}:" name="group_id" value=")([^"]*)(" />)#Us]]></find>
+      <replace><![CDATA[${1}{xen:if {$group.new_group_id}, {$group.new_group_id}, ${2}}${3}]]></replace>
+    </modification>
+    <modification template="option_group_list" modification_key="th_optionGroupList_options" description="Adds top chooser to option group list." execution_order="10" enabled="1" action="preg_replace">
+      <find><![CDATA[#{xen:adminlink 'options/add-group'(.*<xen:require js="js/xenforo/filter_list.js" />)(.*){xen:adminlink 'options'}(.*count=<span class="FilterListCount">{xen:count \$groups}</span>', 'total=)({xen:count \$groups})#Us]]></find>
+      <replace><![CDATA[{xen:adminlink 'add-ons/options/add-group', {$addOns.{$addOnSelected}}
+${1}
+<xen:include template="th_top_choosers_options">
+	<xen:set var="$prefix">options</xen:set>
+</xen:include>
+${2}
+{xen:adminlink 'add-ons/options', {$addOns.{$addOnSelected}}}
+${3}
+{xen:if {$addOns.{$addOnSelected}}, {$groupCount}, ${4}}]]></replace>
+    </modification>
+  </admin_template_modifications>
+  <code_events/>
+  <code_event_listeners>
+    <listener event_id="controller_pre_dispatch" execute_order="10" callback_class="ThemeHouse_Listener_ControllerPreDispatch" callback_method="controllerPreDispatch" active="1" hint="" description=""/>
+    <listener event_id="file_health_check" execute_order="10" callback_class="ThemeHouse_Options_Listener_FileHealthCheck" callback_method="fileHealthCheck" active="1" hint="" description=""/>
+    <listener event_id="init_dependencies" execute_order="10" callback_class="ThemeHouse_Listener_InitDependencies" callback_method="initDependencies" active="1" hint="" description=""/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_Options_Listener_LoadClass" callback_method="loadClassController" active="0" hint="XenForo_ControllerAdmin_Option" description="XenForo_ControllerAdmin_Option (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_Options_Listener_LoadClass" callback_method="loadClassRoutePrefix" active="0" hint="XenForo_Route_PrefixAdmin_AddOns" description="XenForo_Route_PrefixAdmin_AddOns (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_Options_Listener_LoadClass" callback_method="loadClassRoutePrefix" active="0" hint="XenForo_Route_PrefixAdmin_Options" description="XenForo_Route_PrefixAdmin_Options (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class_controller" execute_order="10" callback_class="ThemeHouse_Options_Listener_LoadClass" callback_method="loadClassController" active="1" hint="" description="(For XenForo 1.1 and below)" compatibility_switch="1"/>
+    <listener event_id="load_class_route_prefix" execute_order="10" callback_class="ThemeHouse_Options_Listener_LoadClass" callback_method="loadClassRoutePrefix" active="1" hint="" description="(For XenForo 1.1 and below)" compatibility_switch="1"/>
+  </code_event_listeners>
+  <cron/>
+  <email_templates/>
+  <email_template_modifications/>
+  <optiongroups>
+    <group group_id="th_options" display_order="2000" debug_only="0"/>
+  </optiongroups>
+  <permissions>
+    <permission_groups/>
+    <permissions/>
+    <interface_groups/>
+  </permissions>
+  <phrases>
+    <phrase title="option_group_th_options" version_id="1416385772" version_string="1.0.0"><![CDATA[[⌂] Options]]></phrase>
+    <phrase title="option_group_th_options_description" version_id="1416385772" version_string="1.0.0"><![CDATA[Options for the [⌂] Options add-on.]]></phrase>
+    <phrase title="th_default_option_group_description_for_x_options" version_id="1416385772" version_string="1.0.0"><![CDATA[Options for the {title} add-on.]]></phrase>
+    <phrase title="th_default_option_group_title_for_x_options" version_id="1416385772" version_string="1.0.0"><![CDATA[{title}]]></phrase>
+  </phrases>
+  <route_prefixes/>
+  <style_properties/>
+  <templates/>
+  <public_template_modifications>
+    <modification template="footer" modification_key="th_copyrightNotice_options" description="Copyright notice for [⌂] Options" execution_order="1" enabled="1" action="callback">
+      <find><![CDATA[/{xen:phrase (?:xenforo|extra)_copyright}/]]></find>
+      <replace><![CDATA[ThemeHouse_Listener_InitDependencies::copyrightNotice]]></replace>
+    </modification>
+  </public_template_modifications>
+  <bb_code_media_sites/>
+  <bb_codes/>
+</addon>
